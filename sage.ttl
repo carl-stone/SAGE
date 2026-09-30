@@ -1,0 +1,451 @@
+# SAGE — Scientific Argument Graph & Epistemology
+# Normative authority: SAGE-Ontology-Specification.md.
+# Every SAGE term and mapping identifies its source and exact adaptation.
+# The example.org namespace is provisional. Upstream ontologies can be loaded explicitly.
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix oa: <http://www.w3.org/ns/oa#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdo: <http://purl.org/see/rdo#> .
+@prefix sage: <https://example.org/sage/ontology#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix spec: <https://example.org/sage/spec#> .
+@prefix swande: <http://purl.org/swan/2.0/discourse-elements/> .
+
+<https://example.org/sage/ontology> a owl:Ontology ;
+    dcterms:conformsTo <https://example.org/sage/spec> ;
+    dcterms:title "SAGE — Scientific Argument Graph & Epistemology"@en ;
+    rdfs:comment "SAGE-Ontology-Specification.md is the normative authority. This file supplies selected vocabulary declarations and mappings under a provisional example.org namespace."@en .
+
+sage:Accepts a skos:Concept ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://www.w3.org/TR/2009/REC-skos-reference-20090818/> ;
+    rdfs:comment "Treats the proposition as warranted within its applicable scope."@en ;
+    rdfs:isDefinedBy spec:core ;
+    skos:changeNote "SAGE-defined categorical position organized as a SKOS concept."@en ;
+    skos:inScheme sage:StanceScheme ;
+    skos:prefLabel "Accepts"@en .
+
+sage:Agent a owl:Class ;
+    dcterms:source rdo:agent,
+        <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://www.w3.org/TR/2012/REC-owl2-syntax-20121211/> ;
+    rdfs:comment "A person, organization, or information-processing device contributing information to an inquiry."@en ;
+    rdfs:isDefinedBy spec:aliases ;
+    owl:equivalentClass rdo:agent ;
+    skos:changeNote "Exact alias of rdo:agent, retaining its definition."@en .
+
+sage:Argument a owl:Class ;
+    dcterms:source rdo:argument,
+        <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://www.w3.org/TR/2012/REC-owl2-syntax-20121211/> ;
+    rdfs:comment "Premise assertions offered jointly as grounds for a conclusion assertion."@en ;
+    rdfs:isDefinedBy spec:aliases ;
+    owl:equivalentClass rdo:argument ;
+    skos:changeNote "Exact alias of rdo:argument, retaining its definition."@en .
+
+sage:Assertion a owl:Class ;
+    dcterms:source rdo:assertion,
+        <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://www.w3.org/TR/2012/REC-owl2-syntax-20121211/> ;
+    rdfs:comment "An agent’s claim that a proposition is true on a particular occasion."@en ;
+    rdfs:isDefinedBy spec:aliases ;
+    owl:equivalentClass rdo:assertion ;
+    skos:changeNote "Exact alias of rdo:assertion, retaining its definition."@en .
+
+sage:DiscourseAssessment a owl:Class ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://github.com/pav-ontology/swan-ontology/blob/2.0.1/discourse-relationships.owl>,
+        <https://pav-ontology.github.io/pav/>,
+        <https://www.w3.org/TR/2013/REC-prov-o-20130430/>,
+        <https://www.w3.org/TR/2014/REC-rdf11-mt-20140225/> ;
+    rdfs:comment "An attributed assessment that a SWAN discourse relation holds between two resources."@en ;
+    rdfs:isDefinedBy spec:core ;
+    rdfs:subClassOf rdf:Statement,
+        prov:Entity ;
+    skos:changeNote "SAGE specialization of rdf:Statement and prov:Entity with author attribution and optional source, context, and reasons. Retains RDF’s separation between describing and asserting a triple; direct SWAN triples are also supported."@en .
+
+sage:Proposition a owl:Class ;
+    dcterms:source rdo:proposition,
+        <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://www.w3.org/TR/2012/REC-owl2-syntax-20121211/> ;
+    rdfs:comment "The content of a statement that can be true or false."@en ;
+    rdfs:isDefinedBy spec:aliases ;
+    owl:equivalentClass rdo:proposition ;
+    skos:changeNote "Exact alias of rdo:proposition, retaining its definition."@en .
+
+sage:Question a owl:Class ;
+    dcterms:source swande:Question,
+        <https://example.org/sage/spec>,
+        <https://github.com/pav-ontology/swan-ontology/blob/2.0.1/discourse-elements.owl>,
+        <https://www.w3.org/TR/2012/REC-owl2-syntax-20121211/> ;
+    rdfs:comment "A research question."@en ;
+    rdfs:isDefinedBy spec:aliases ;
+    owl:equivalentClass swande:Question ;
+    skos:changeNote "Exact alias of swande:Question, retaining its definition."@en .
+
+sage:Rejects a skos:Concept ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://www.w3.org/TR/2009/REC-skos-reference-20090818/> ;
+    rdfs:comment "Judges the proposition inadequate as a conclusion within its applicable scope."@en ;
+    rdfs:isDefinedBy spec:core ;
+    skos:changeNote "SAGE-defined categorical position organized as a SKOS concept."@en ;
+    skos:inScheme sage:StanceScheme ;
+    skos:prefLabel "Rejects"@en .
+
+sage:Report a owl:Class ;
+    dcterms:source rdo:report,
+        <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://www.w3.org/TR/2012/REC-owl2-syntax-20121211/> ;
+    rdfs:comment "An account of an event, situation, observation, or inquiry."@en ;
+    rdfs:isDefinedBy spec:aliases ;
+    owl:equivalentClass rdo:report ;
+    skos:changeNote "Exact alias of rdo:report, retaining its definition."@en .
+
+sage:TentativelyAccepts a skos:Concept ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://www.w3.org/TR/2009/REC-skos-reference-20090818/> ;
+    rdfs:comment "Accepts the proposition provisionally."@en ;
+    rdfs:isDefinedBy spec:core ;
+    skos:changeNote "SAGE-defined categorical position organized as a SKOS concept."@en ;
+    skos:inScheme sage:StanceScheme ;
+    skos:prefLabel "TentativelyAccepts"@en .
+
+sage:Text a owl:Class ;
+    dcterms:source rdo:text,
+        <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://www.w3.org/TR/2012/REC-owl2-syntax-20121211/> ;
+    rdfs:comment "A lexical expression in a natural or formal language."@en ;
+    rdfs:isDefinedBy spec:aliases ;
+    owl:equivalentClass rdo:text ;
+    skos:changeNote "Exact alias of rdo:text, retaining its definition."@en .
+
+sage:WithholdsJudgment a skos:Concept ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://www.w3.org/TR/2009/REC-skos-reference-20090818/> ;
+    rdfs:comment "Explicitly suspends judgment about the proposition."@en ;
+    rdfs:isDefinedBy spec:core ;
+    skos:changeNote "SAGE-defined categorical position organized as a SKOS concept."@en ;
+    skos:inScheme sage:StanceScheme ;
+    skos:prefLabel "WithholdsJudgment"@en .
+
+sage:assertedBy a owl:ObjectProperty ;
+    dcterms:source rdo:is_assertion_made_by,
+        <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://www.w3.org/TR/2012/REC-owl2-syntax-20121211/> ;
+    rdfs:comment "Assertion → agent making the claim."@en ;
+    rdfs:isDefinedBy spec:aliases ;
+    owl:equivalentProperty rdo:is_assertion_made_by ;
+    skos:changeNote "Exact alias of rdo:is_assertion_made_by, retaining its meaning and direction."@en .
+
+sage:asserts a owl:ObjectProperty ;
+    dcterms:source rdo:is_assertion_asserting,
+        <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://www.w3.org/TR/2012/REC-owl2-syntax-20121211/> ;
+    rdfs:comment "Assertion → proposition."@en ;
+    rdfs:isDefinedBy spec:aliases ;
+    owl:equivalentProperty rdo:is_assertion_asserting ;
+    skos:changeNote "Exact alias of rdo:is_assertion_asserting, retaining its meaning and direction."@en .
+
+sage:assumes a owl:ObjectProperty ;
+    dcterms:source <https://doi.org/10.1186/2041-1480-5-S1-S1>,
+        <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl> ;
+    rdfs:comment "A premise taken as given within this argument."@en ;
+    rdfs:domain rdo:argument ;
+    rdfs:isDefinedBy spec:core ;
+    rdfs:range rdo:assertion ;
+    rdfs:subPropertyOf rdo:has_premise ;
+    skos:changeNote "SAGE specialization of rdo:has_premise identifying assumption use within an argument."@en .
+
+sage:decidedBy a owl:ObjectProperty ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://pav-ontology.github.io/pav/> ;
+    rdfs:comment "An agent who made the recorded choice."@en ;
+    rdfs:domain sage:Decision ;
+    rdfs:isDefinedBy spec:core ;
+    rdfs:range rdo:agent ;
+    skos:changeNote "SAGE property identifying the decision-maker role."@en .
+
+sage:expressedAs a owl:ObjectProperty ;
+    dcterms:source rdo:is_proposition_expressed_in,
+        <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://www.w3.org/TR/2012/REC-owl2-syntax-20121211/> ;
+    rdfs:comment "Proposition → text expressing it."@en ;
+    rdfs:isDefinedBy spec:aliases ;
+    owl:equivalentProperty rdo:is_proposition_expressed_in ;
+    skos:changeNote "Exact alias of rdo:is_proposition_expressed_in, retaining its meaning and direction."@en .
+
+sage:hasConclusion a owl:ObjectProperty ;
+    dcterms:source rdo:has_conclusion,
+        <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://www.w3.org/TR/2012/REC-owl2-syntax-20121211/> ;
+    rdfs:comment "Argument → conclusion assertion."@en ;
+    rdfs:isDefinedBy spec:aliases ;
+    owl:equivalentProperty rdo:has_conclusion ;
+    skos:changeNote "Exact alias of rdo:has_conclusion, retaining its meaning and direction."@en .
+
+sage:hasPremise a owl:ObjectProperty ;
+    dcterms:source rdo:has_premise,
+        <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://www.w3.org/TR/2012/REC-owl2-syntax-20121211/> ;
+    rdfs:comment "Argument → premise assertion."@en ;
+    rdfs:isDefinedBy spec:aliases ;
+    owl:equivalentProperty rdo:has_premise ;
+    skos:changeNote "Exact alias of rdo:has_premise, retaining its meaning and direction."@en .
+
+sage:hasRationale a owl:ObjectProperty ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl> ;
+    rdfs:comment "A structured RDO argument offered as a reason."@en ;
+    rdfs:isDefinedBy spec:core ;
+    rdfs:range rdo:argument ;
+    skos:changeNote "SAGE optional link to RDO’s argument concept with an unrestricted domain. Informal explanations use rdfs:comment."@en .
+
+sage:heldBy a owl:ObjectProperty ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://pav-ontology.github.io/pav/> ;
+    rdfs:comment "The agent whose position is recorded."@en ;
+    rdfs:domain sage:Stance ;
+    rdfs:isDefinedBy spec:core ;
+    rdfs:range rdo:agent ;
+    skos:changeNote "SAGE property identifying the stance-holder role."@en .
+
+sage:inContext a owl:ObjectProperty ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://www.w3.org/TR/2009/NOTE-hcls-swan-20091020/>,
+        <https://www.w3.org/TR/2013/REC-prov-o-20130430/> ;
+    rdfs:comment "A context of applicability, such as an inquiry or analytical setting."@en ;
+    rdfs:isDefinedBy spec:core ;
+    rdfs:range prov:Entity ;
+    skos:changeNote "SAGE scope relationship with an unrestricted domain and optional context values. Each value identifies a context of applicability; a combination of conditions can be represented as one context."@en .
+
+sage:reportedIn a owl:ObjectProperty ;
+    dcterms:source rdo:is_assertion_made_in,
+        <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://www.w3.org/TR/2012/REC-owl2-syntax-20121211/> ;
+    rdfs:comment "Assertion → report or report part in which the claim was made."@en ;
+    rdfs:isDefinedBy spec:aliases ;
+    owl:equivalentProperty rdo:is_assertion_made_in ;
+    skos:changeNote "Exact alias of rdo:is_assertion_made_in, retaining its meaning and direction."@en .
+
+sage:selects a owl:ObjectProperty ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://www.w3.org/TR/2013/REC-prov-o-20130430/> ;
+    rdfs:comment "An option selected by a decision, often a plan."@en ;
+    rdfs:domain sage:Decision ;
+    rdfs:isDefinedBy spec:core ;
+    rdfs:range prov:Entity ;
+    skos:changeNote "SAGE choice relationship supporting one or more selected options in the structural profile."@en .
+
+sage:text a owl:DatatypeProperty ;
+    dcterms:source rdo:has_lexical_structure,
+        <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://www.w3.org/TR/2012/REC-owl2-syntax-20121211/> ;
+    rdfs:comment "Text → lexical literal."@en ;
+    rdfs:isDefinedBy spec:aliases ;
+    owl:equivalentProperty rdo:has_lexical_structure ;
+    skos:changeNote "Exact alias of rdo:has_lexical_structure, retaining its meaning and direction."@en .
+
+swande:Claim rdfs:subClassOf swande:ResearchStatement .
+
+swande:Hypothesis rdfs:subClassOf swande:ResearchStatement .
+
+prov:Organization rdfs:subClassOf prov:Agent .
+
+prov:Person rdfs:subClassOf prov:Agent .
+
+prov:Plan rdfs:subClassOf prov:Entity .
+
+prov:SoftwareAgent rdfs:subClassOf prov:Agent .
+
+sage:Stance a owl:Class ;
+    dcterms:source <https://doi.org/10.1186/2041-1480-5-S1-S1>,
+        <https://example.org/sage/spec>,
+        <https://www.w3.org/TR/2013/REC-prov-o-20130430/>,
+        <https://www.w3.org/TR/2017/REC-annotation-model-20170223/> ;
+    rdfs:comment "An agent’s position toward a proposition, with optional context, provenance, and reasons."@en ;
+    rdfs:isDefinedBy spec:core ;
+    rdfs:subClassOf oa:Annotation,
+        prov:Entity ;
+    owl:disjointWith rdo:assertion ;
+    skos:changeNote "SAGE specialization of oa:Annotation and prov:Entity with a proposition target, stance-value body, and holder. Context, provenance, and reasons are optional. Disjoint with rdo:assertion."@en .
+
+sage:Decision a owl:Class ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://github.com/pav-ontology/swan-ontology/blob/2.0.1/discourse-elements.owl>,
+        <https://www.w3.org/TR/2013/REC-prov-o-20130430/> ;
+    rdfs:comment "A record identifying who made a choice and which options they selected."@en ;
+    rdfs:isDefinedBy spec:core ;
+    rdfs:subClassOf swande:DiscourseElement,
+        prov:Entity ;
+    skos:changeNote "SAGE specialization of swande:DiscourseElement and prov:Entity with decision makers and selected options. Context, source, and reasons are optional."@en .
+
+rdo:proposition rdfs:subClassOf prov:Entity .
+
+rdo:report rdfs:subClassOf rdo:report_part .
+
+rdo:report_part rdfs:subClassOf prov:Entity .
+
+rdo:text rdfs:subClassOf prov:Entity .
+
+swande:Question rdfs:subClassOf swande:DiscourseElement,
+        prov:Entity .
+
+sage:StanceScheme a skos:ConceptScheme ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://www.w3.org/TR/2009/REC-skos-reference-20090818/> ;
+    rdfs:comment "Stance controlled vocabulary."@en ;
+    rdfs:isDefinedBy spec:core ;
+    skos:changeNote "SAGE-defined scheme organized using SKOS."@en .
+
+rdo:argument rdfs:subClassOf prov:Entity .
+
+rdo:assertion rdfs:subClassOf prov:Entity .
+
+swande:ResearchStatement rdfs:subClassOf swande:DiscourseElement,
+        prov:Entity .
+
+[] a owl:Axiom ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://www.w3.org/TR/2013/REC-prov-o-20130430/> ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource rdo:text ;
+    owl:annotatedTarget prov:Entity ;
+    skos:changeNote "SAGE-added subclass mapping classifying the information-bearing resource as a prov:Entity."@en .
+
+[] a owl:Axiom ;
+    dcterms:source <https://github.com/pav-ontology/swan-ontology/blob/2.0.1/discourse-elements.owl> ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource swande:Hypothesis ;
+    owl:annotatedTarget swande:ResearchStatement ;
+    skos:changeNote "Reused upstream subclass axiom included in the selected schema for structural preparation."@en .
+
+[] a owl:Axiom ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://github.com/pav-ontology/swan-ontology/blob/2.0.1/discourse-elements.owl>,
+        <https://www.w3.org/TR/2013/REC-prov-o-20130430/> ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource swande:Question ;
+    owl:annotatedTarget prov:Entity ;
+    skos:changeNote "SAGE-added subclass mapping classifying the information-bearing resource as a prov:Entity."@en .
+
+[] a owl:Axiom ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://www.w3.org/TR/2013/REC-prov-o-20130430/> ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource rdo:assertion ;
+    owl:annotatedTarget prov:Entity ;
+    skos:changeNote "SAGE-added subclass mapping classifying the information-bearing resource as a prov:Entity."@en .
+
+[] a owl:Axiom ;
+    dcterms:source <https://www.w3.org/TR/2013/REC-prov-o-20130430/> ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource prov:Organization ;
+    owl:annotatedTarget prov:Agent ;
+    skos:changeNote "Reused upstream subclass axiom included in the selected schema for structural preparation."@en .
+
+[] a owl:Axiom ;
+    dcterms:source <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl> ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource rdo:report ;
+    owl:annotatedTarget rdo:report_part ;
+    skos:changeNote "Reused upstream subclass axiom included in the selected schema for structural preparation."@en .
+
+[] a owl:Axiom ;
+    dcterms:source <https://www.w3.org/TR/2013/REC-prov-o-20130430/> ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource prov:Plan ;
+    owl:annotatedTarget prov:Entity ;
+    skos:changeNote "Reused upstream subclass axiom included in the selected schema for structural preparation."@en .
+
+[] a owl:Axiom ;
+    dcterms:source <https://github.com/pav-ontology/swan-ontology/blob/2.0.1/discourse-elements.owl> ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource swande:Claim ;
+    owl:annotatedTarget swande:ResearchStatement ;
+    skos:changeNote "Reused upstream subclass axiom included in the selected schema for structural preparation."@en .
+
+[] a owl:Axiom ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://www.w3.org/TR/2013/REC-prov-o-20130430/> ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource rdo:report_part ;
+    owl:annotatedTarget prov:Entity ;
+    skos:changeNote "SAGE-added subclass mapping classifying the information-bearing resource as a prov:Entity."@en .
+
+[] a owl:Axiom ;
+    dcterms:source <https://www.w3.org/TR/2013/REC-prov-o-20130430/> ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource prov:SoftwareAgent ;
+    owl:annotatedTarget prov:Agent ;
+    skos:changeNote "Reused upstream subclass axiom included in the selected schema for structural preparation."@en .
+
+[] a owl:Axiom ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://www.w3.org/TR/2013/REC-prov-o-20130430/> ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource rdo:argument ;
+    owl:annotatedTarget prov:Entity ;
+    skos:changeNote "SAGE-added subclass mapping classifying the information-bearing resource as a prov:Entity."@en .
+
+[] a owl:Axiom ;
+    dcterms:source <https://github.com/pav-ontology/swan-ontology/blob/2.0.1/discourse-elements.owl> ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource swande:Question ;
+    owl:annotatedTarget swande:DiscourseElement ;
+    skos:changeNote "Reused upstream subclass axiom included in the selected schema for structural preparation."@en .
+
+[] a owl:Axiom ;
+    dcterms:source <https://www.w3.org/TR/2013/REC-prov-o-20130430/> ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource prov:Person ;
+    owl:annotatedTarget prov:Agent ;
+    skos:changeNote "Reused upstream subclass axiom included in the selected schema for structural preparation."@en .
+
+[] a owl:Axiom ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
+        <https://www.w3.org/TR/2013/REC-prov-o-20130430/> ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource rdo:proposition ;
+    owl:annotatedTarget prov:Entity ;
+    skos:changeNote "SAGE-added subclass mapping classifying the information-bearing resource as a prov:Entity."@en .
+
+[] a owl:Axiom ;
+    dcterms:source <https://github.com/pav-ontology/swan-ontology/blob/2.0.1/discourse-elements.owl> ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource swande:ResearchStatement ;
+    owl:annotatedTarget swande:DiscourseElement ;
+    skos:changeNote "Reused upstream subclass axiom included in the selected schema for structural preparation."@en .
+
+[] a owl:Axiom ;
+    dcterms:source <https://example.org/sage/spec>,
+        <https://github.com/pav-ontology/swan-ontology/blob/2.0.1/discourse-elements.owl>,
+        <https://www.w3.org/TR/2013/REC-prov-o-20130430/> ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource swande:ResearchStatement ;
+    owl:annotatedTarget prov:Entity ;
+    skos:changeNote "SAGE-added subclass mapping classifying the information-bearing resource as a prov:Entity."@en .
+

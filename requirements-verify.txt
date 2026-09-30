@@ -1,0 +1,4 @@
+# Verification tools, separate from the ontology's dependencies.
+# Sources: https://pypi.org/project/pyshacl/ and https://pypi.org/project/rdflib/
+pyshacl==0.40.1
+rdflib==7.5.0

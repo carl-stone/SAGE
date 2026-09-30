@@ -1,0 +1,74 @@
+# Declaration-only support for the temporary OWL reasoning view.
+# The specification and sage.ttl supply all scientific axioms.
+# Upstream classes/properties retain their definitions; no full imports are loaded.
+# Source tags below apply to each declared term. DCTerms has generic RDF properties;
+# this reasoning view uses its documentary fields as OWL annotations.
+@prefix rdo: <http://purl.org/see/rdo#> .
+@prefix swande: <http://purl.org/swan/2.0/discourse-elements/> .
+@prefix swandr: <http://purl.org/swan/2.0/discourse-relationships/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix pav: <http://purl.org/pav/> .
+@prefix oa: <http://www.w3.org/ns/oa#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+# RDO: https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl
+rdo:proposition a owl:Class ; dcterms:source <http://purl.org/see/rdo> .
+rdo:assertion a owl:Class ; dcterms:source <http://purl.org/see/rdo> .
+rdo:argument a owl:Class ; dcterms:source <http://purl.org/see/rdo> .
+rdo:agent a owl:Class ; dcterms:source <http://purl.org/see/rdo> .
+rdo:text a owl:Class ; dcterms:source <http://purl.org/see/rdo> .
+rdo:report a owl:Class ; dcterms:source <http://purl.org/see/rdo> .
+rdo:report_part a owl:Class ; dcterms:source <http://purl.org/see/rdo> .
+rdo:is_assertion_asserting a owl:ObjectProperty ; dcterms:source <http://purl.org/see/rdo> .
+rdo:is_assertion_made_by a owl:ObjectProperty ; dcterms:source <http://purl.org/see/rdo> .
+rdo:is_assertion_made_in a owl:ObjectProperty ; dcterms:source <http://purl.org/see/rdo> .
+rdo:has_premise a owl:ObjectProperty ; dcterms:source <http://purl.org/see/rdo> .
+rdo:has_conclusion a owl:ObjectProperty ; dcterms:source <http://purl.org/see/rdo> .
+rdo:is_proposition_expressed_in a owl:ObjectProperty ; dcterms:source <http://purl.org/see/rdo> .
+rdo:has_lexical_structure a owl:DatatypeProperty ; dcterms:source <http://purl.org/see/rdo> .
+
+# SWAN: preserved vocabulary in repository tag 2.0.1; declarations only.
+swande:DiscourseElement a owl:Class ; dcterms:source <http://purl.org/swan/2.0/discourse-elements/> .
+swande:ResearchStatement a owl:Class ; dcterms:source <http://purl.org/swan/2.0/discourse-elements/> .
+swande:Hypothesis a owl:Class ; dcterms:source <http://purl.org/swan/2.0/discourse-elements/> .
+swande:Claim a owl:Class ; dcterms:source <http://purl.org/swan/2.0/discourse-elements/> .
+swande:Question a owl:Class ; dcterms:source <http://purl.org/swan/2.0/discourse-elements/> .
+swandr:refersTo a owl:ObjectProperty ; dcterms:source <http://purl.org/swan/2.0/discourse-relationships/> .
+swandr:respondsTo a owl:ObjectProperty ; dcterms:source <http://purl.org/swan/2.0/discourse-relationships/> .
+
+# PROV-O: https://www.w3.org/TR/2013/REC-prov-o-20130430/
+prov:Entity a owl:Class ; dcterms:source <http://www.w3.org/ns/prov-o> .
+prov:Activity a owl:Class ; dcterms:source <http://www.w3.org/ns/prov-o> .
+prov:Agent a owl:Class ; dcterms:source <http://www.w3.org/ns/prov-o> .
+prov:Person a owl:Class ; dcterms:source <http://www.w3.org/ns/prov-o> .
+prov:Organization a owl:Class ; dcterms:source <http://www.w3.org/ns/prov-o> .
+prov:SoftwareAgent a owl:Class ; dcterms:source <http://www.w3.org/ns/prov-o> .
+prov:Plan a owl:Class ; dcterms:source <http://www.w3.org/ns/prov-o> .
+prov:used a owl:ObjectProperty ; dcterms:source <http://www.w3.org/ns/prov-o> .
+prov:wasGeneratedBy a owl:ObjectProperty ; dcterms:source <http://www.w3.org/ns/prov-o> .
+prov:wasAssociatedWith a owl:ObjectProperty ; dcterms:source <http://www.w3.org/ns/prov-o> .
+
+# PAV: https://pav-ontology.github.io/pav/
+pav:authoredBy a owl:ObjectProperty ; dcterms:source <http://purl.org/pav/> .
+pav:createdBy a owl:ObjectProperty ; dcterms:source <http://purl.org/pav/> .
+
+# Web Annotation: https://www.w3.org/TR/2017/REC-annotation-vocab-20170223/
+oa:Annotation a owl:Class ; dcterms:source <http://www.w3.org/ns/oa#> .
+oa:hasBody a owl:ObjectProperty ; dcterms:source <http://www.w3.org/ns/oa#> .
+oa:hasTarget a owl:ObjectProperty ; dcterms:source <http://www.w3.org/ns/oa#> .
+
+# SKOS: https://www.w3.org/TR/2009/REC-skos-reference-20090818/
+skos:Concept a owl:Class ; dcterms:source <http://www.w3.org/2004/02/skos/core> .
+skos:ConceptScheme a owl:Class ; dcterms:source <http://www.w3.org/2004/02/skos/core> .
+skos:inScheme a owl:ObjectProperty ; dcterms:source <http://www.w3.org/2004/02/skos/core> .
+skos:prefLabel a owl:AnnotationProperty ; dcterms:source <http://www.w3.org/2004/02/skos/core> .
+skos:changeNote a owl:AnnotationProperty ; dcterms:source <http://www.w3.org/2004/02/skos/core> .
+
+# DCMI: https://www.dublincore.org/specifications/dublin-core/dcmi-terms/
+# OWL annotation typing is a verification-adapter choice for these documentary fields.
+dcterms:source a owl:AnnotationProperty ; dcterms:source <http://purl.org/dc/terms/> .
+dcterms:title a owl:AnnotationProperty ; dcterms:source <http://purl.org/dc/terms/> .
+dcterms:description a owl:AnnotationProperty ; dcterms:source <http://purl.org/dc/terms/> .
+dcterms:conformsTo a owl:AnnotationProperty ; dcterms:source <http://purl.org/dc/terms/> .
