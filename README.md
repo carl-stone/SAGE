@@ -1,32 +1,27 @@
 # SAGE
 
-SAGE represents scientific claims, evidence, arguments, and researchers’ positions in a shared knowledge graph.
+SAGE unifies SWAN's scientific discourse vocabulary with SEE's Reasoning and Discourse Ontology. A SWAN Claim or Hypothesis is also a SEE Assertion on the same individual, with its content, asserting agent, and argument connections. Direct SWAN relationships connect scientific contributions; their hierarchy and symmetry support queries at broader levels. Claims and Hypotheses use their proposition text without requiring a duplicate description.
 
-## Start here
-
-Read **SAGE-Ontology-Specification.md**. It defines the system and is the ultimate authority. The two Turtle files implement it for software.
+Read [SAGE-Ontology-Specification.md](SAGE-Ontology-Specification.md) for the normative definition and worked example.
 
 | File | Purpose |
 |---|---|
-| `SAGE-Ontology-Specification.md` | The human-readable specification: concepts, relationships, sources, and structural requirements. |
-| `sage.ttl` | The machine-readable ontology: vocabulary, aliases, and formal relationships. |
-| `sage.shacl.ttl` | Rules for checking whether graph data has the structure specified in the document. |
+| `SAGE-Ontology-Specification.md` | Scientific model, vocabulary, alignments, and structural requirements. |
+| `sage.ttl` | Exact aliases and selected OWL/RDFS axioms, including the two SAGE alignments. |
+| `sage.shacl.ttl` | Structural validation, including inherited Assertion requirements for Claims and Hypotheses. |
+| `REWRITE-NOTES.md` | Applied design decisions for this rewrite. |
 
-These three files are the SAGE definition. They can be read and used without installing the verification tools.
+The specification and Turtle files can be used without the verification tools. Before applying SHACL, normalize aliases and expand the selected subclass/subproperty and symmetry axioms as described in specification §5.
 
-## Optional verification tools
+The specification also explains identity across publications and corrections. [A published example](examples/README.md) models observations and competing explanations from Meselson and Stahl’s DNA replication experiment.
 
-`verification/` contains the checking scripts, a small set of semantic checks, and the declarations needed by the OWL reasoner. Its `README.md` explains their scope. `Makefile` provides the commands; `requirements-verify.txt` lists the Python dependencies.
+## Verification
 
-To run them, open a terminal in this `SAGE` folder. With Python 3.10+, a Java 11+ JDK, make, and curl installed:
+With Python 3.10+, a Java 11+ JDK, make, and curl:
 
 ```sh
 make setup
 make verify
 ```
 
-Setup requires internet access to download Python dependencies and ROBOT. Those external tools are not bundled. Results go into `build/verification/`.
-
-The verification setup has been prepared, but the ROBOT/HermiT and pySHACL engine checks have not yet run in the authoring environment because dependency downloads were blocked.
-
-This package contains the latest specification and its matching files, plus the verification setup. It replaces the earlier downloads; old drafts, audit reports, and superseded test suites are omitted.
+Setup downloads Python dependencies and ROBOT. Verification checks the specification's example with pySHACL and the selected ontology with ROBOT/HermiT, including Java entailment checks. Results go into `build/verification/`. See [verification/README.md](verification/README.md) for the checks and their scope.

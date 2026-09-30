@@ -15,7 +15,6 @@
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix spec: <https://example.org/sage/spec#> .
 @prefix swande: <http://purl.org/swan/2.0/discourse-elements/> .
-@prefix swandr: <http://purl.org/swan/2.0/discourse-relationships/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 sage:ActivityShape a sh:NodeShape ;
@@ -87,9 +86,7 @@ sage:AgentShape a sh:NodeShape ;
             sh:node sage:ReadableTextShape ;
             sh:path rdfs:label ] ;
     sh:targetClass rdo:agent ;
-    sh:targetObjectsOf rdo:is_assertion_made_by,
-        sage:decidedBy,
-        sage:heldBy .
+    sh:targetObjectsOf rdo:is_assertion_made_by .
 
 sage:ArgumentShape a sh:NodeShape ;
     dcterms:source <https://doi.org/10.1186/2041-1480-5-S1-S1>,
@@ -124,22 +121,19 @@ sage:ArgumentShape a sh:NodeShape ;
             sh:nodeKind sh:BlankNodeOrIRI ;
             sh:path rdo:has_conclusion ] ;
     sh:targetClass rdo:argument ;
-    sh:targetObjectsOf sage:hasRationale ;
     sh:targetSubjectsOf rdo:has_conclusion,
-        rdo:has_premise,
-        sage:assumes .
+        rdo:has_premise .
 
 sage:AssertionShape a sh:NodeShape ;
     dcterms:source <https://doi.org/10.1186/2041-1480-5-S1-S1>,
         <https://example.org/sage/spec>,
         <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
         <https://www.w3.org/TR/2017/REC-shacl-20170720/> ;
-    rdfs:comment "An attributed claim with its proposition, asserting agents, and optional links to reports in which it was made."@en ;
+    rdfs:comment "An assertion with its proposition, asserting agents, and optional reports. SWAN Claims and Hypotheses inherit these requirements after section 5 preparation."@en ;
     rdfs:isDefinedBy spec:constraints ;
     skos:changeNote "SAGE profile requirements and targets are defined in section 4."@en ;
     sh:class rdo:assertion ;
     sh:node sage:RecordShape ;
-    sh:not [ sh:class sage:Stance ] ;
     sh:property [ dcterms:source rdo:is_assertion_made_by,
                 spec:constraints ;
             skos:changeNote "SAGE profile constraint; cardinality and value requirements are defined in section 4."@en ;
@@ -202,94 +196,6 @@ sage:AssociationShape a sh:NodeShape ;
     sh:targetObjectsOf prov:qualifiedAssociation ;
     sh:targetSubjectsOf prov:hadPlan .
 
-sage:ContextShape a sh:NodeShape ;
-    dcterms:source <https://example.org/sage/spec>,
-        <https://www.w3.org/TR/2013/REC-prov-o-20130430/>,
-        <https://www.w3.org/TR/2017/REC-shacl-20170720/> ;
-    rdfs:comment "An optional entity identifying a context of applicability."@en ;
-    rdfs:isDefinedBy spec:constraints ;
-    skos:changeNote "SAGE profile requirements and targets are defined in section 4."@en ;
-    sh:class prov:Entity ;
-    sh:nodeKind sh:BlankNodeOrIRI ;
-    sh:targetObjectsOf sage:inContext .
-
-sage:DecisionShape a sh:NodeShape ;
-    dcterms:source <https://example.org/sage/spec>,
-        <https://github.com/pav-ontology/swan-ontology/blob/2.0.1/discourse-elements.owl>,
-        <https://pav-ontology.github.io/pav/>,
-        <https://www.w3.org/TR/2013/REC-prov-o-20130430/>,
-        <https://www.w3.org/TR/2017/REC-shacl-20170720/> ;
-    rdfs:comment "A recorded choice with decision makers and selected options. Reasons, source documents, and contexts are optional."@en ;
-    rdfs:isDefinedBy spec:constraints ;
-    skos:changeNote "SAGE profile requirements and targets are defined in section 4."@en ;
-    sh:class sage:Decision ;
-    sh:node sage:RecordShape ;
-    sh:property [ dcterms:source sage:decidedBy,
-                spec:constraints ;
-            skos:changeNote "SAGE profile constraint; cardinality and value requirements are defined in section 4."@en ;
-            sh:class rdo:agent ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:path sage:decidedBy ],
-        [ dcterms:source sage:selects,
-                spec:constraints ;
-            skos:changeNote "SAGE profile constraint; cardinality and value requirements are defined in section 4."@en ;
-            sh:class prov:Entity ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:path sage:selects ],
-        [ dcterms:source dcterms:description,
-                spec:constraints ;
-            skos:changeNote "SAGE profile constraint; cardinality and value requirements are defined in section 4."@en ;
-            sh:minCount 1 ;
-            sh:node sage:ReadableTextShape ;
-            sh:path dcterms:description ] ;
-    sh:targetClass sage:Decision ;
-    sh:targetSubjectsOf sage:decidedBy,
-        sage:selects .
-
-sage:DiscourseAssessmentShape a sh:NodeShape ;
-    dcterms:source <https://example.org/sage/spec>,
-        <https://github.com/pav-ontology/swan-ontology/blob/2.0.1/discourse-relationships.owl>,
-        <https://pav-ontology.github.io/pav/>,
-        <https://www.w3.org/TR/2014/REC-rdf11-mt-20140225/>,
-        <https://www.w3.org/TR/2017/REC-shacl-20170720/> ;
-    rdfs:comment "An attributed reified SWAN relationship. Ordinary SWAN relationships may also be used directly."@en ;
-    rdfs:isDefinedBy spec:constraints ;
-    skos:changeNote "SAGE profile requirements and targets are defined in section 4."@en ;
-    sh:class sage:DiscourseAssessment ;
-    sh:node sage:RecordShape ;
-    sh:property [ dcterms:source pav:authoredBy,
-                spec:constraints ;
-            skos:changeNote "SAGE profile constraint; cardinality and value requirements are defined in section 4."@en ;
-            sh:class rdo:agent ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:path pav:authoredBy ],
-        [ dcterms:source rdf:predicate,
-                spec:constraints ;
-            skos:changeNote "SAGE profile constraint; cardinality and value requirements are defined in section 4."@en ;
-            sh:in ( swandr:relatesTo swandr:refersTo swandr:respondsTo swandr:respondsNeutrallyTo swandr:respondsPositivelyTo swandr:respondsNegativelyTo swandr:inconsistentWith swandr:consistentWith swandr:relevantTo swandr:alternativeTo swandr:motivates swandr:arisesFrom swandr:referencesAsSupportiveEvidence swandr:referencesAsRelevantEvidence swandr:referencesAsInconsistentEvidence ) ;
-            sh:maxCount 1 ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:IRI ;
-            sh:path rdf:predicate ],
-        [ dcterms:source rdf:subject,
-                spec:constraints ;
-            skos:changeNote "SAGE profile constraint; cardinality and value requirements are defined in section 4."@en ;
-            sh:maxCount 1 ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:path rdf:subject ],
-        [ dcterms:source rdf:object,
-                spec:constraints ;
-            skos:changeNote "SAGE profile constraint; cardinality and value requirements are defined in section 4."@en ;
-            sh:maxCount 1 ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:path rdf:object ] ;
-    sh:targetClass sage:DiscourseAssessment .
-
 sage:EntityShape a sh:NodeShape ;
     dcterms:source <https://example.org/sage/spec>,
         <https://www.w3.org/TR/2013/REC-prov-o-20130430/>,
@@ -320,8 +226,7 @@ sage:EntityShape a sh:NodeShape ;
             sh:path prov:wasAttributedTo ] ;
     sh:targetClass prov:Entity ;
     sh:targetObjectsOf prov:used,
-        prov:wasDerivedFrom,
-        sage:selects ;
+        prov:wasDerivedFrom ;
     sh:targetSubjectsOf prov:wasAttributedTo,
         prov:wasDerivedFrom,
         prov:wasGeneratedBy .
@@ -468,11 +373,13 @@ sage:ResearchStatementShape a sh:NodeShape ;
         <https://github.com/pav-ontology/swan-ontology/blob/2.0.1/discourse-elements.owl>,
         <https://pav-ontology.github.io/pav/>,
         <https://www.w3.org/TR/2017/REC-shacl-20170720/> ;
-    rdfs:comment "A SWAN statement with a formulation and intellectual author; sources and record-creation metadata are optional."@en ;
+    rdfs:comment "A SWAN statement with an intellectual author. Assertions obtain their formulation from their proposition; other statements require a description."@en ;
     rdfs:isDefinedBy spec:constraints ;
     skos:changeNote "SAGE profile requirements and targets are defined in section 4."@en ;
     sh:class swande:ResearchStatement ;
     sh:node sage:RecordShape ;
+    sh:or ( [ sh:class rdo:assertion ]
+            [ sh:property [ sh:path dcterms:description ; sh:minCount 1 ] ] ) ;
     sh:property [ dcterms:source pav:authoredBy,
                 spec:constraints ;
             skos:changeNote "SAGE profile constraint; cardinality and value requirements are defined in section 4."@en ;
@@ -483,9 +390,9 @@ sage:ResearchStatementShape a sh:NodeShape ;
         [ dcterms:source dcterms:description,
                 spec:constraints ;
             skos:changeNote "SAGE profile constraint; cardinality and value requirements are defined in section 4."@en ;
-            sh:minCount 1 ;
             sh:node sage:ReadableTextShape ;
             sh:path dcterms:description ] ;
+    # Claims and Hypotheses also reach AssertionShape through their SAGE alignment.
     sh:targetClass swande:ResearchStatement .
 
 sage:SpecificResourceShape a sh:NodeShape ;
@@ -513,44 +420,6 @@ sage:SpecificResourceShape a sh:NodeShape ;
     sh:targetSubjectsOf oa:hasSelector,
         oa:hasSource .
 
-sage:StanceShape a sh:NodeShape ;
-    dcterms:source <https://doi.org/10.1186/2041-1480-5-S1-S1>,
-        <https://example.org/sage/spec>,
-        <https://www.w3.org/TR/2017/REC-annotation-model-20170223/>,
-        <https://www.w3.org/TR/2017/REC-shacl-20170720/> ;
-    rdfs:comment "A position with a holder, proposition, and stance value. Contexts, sources, and reasons are optional."@en ;
-    rdfs:isDefinedBy spec:constraints ;
-    skos:changeNote "SAGE profile requirements and targets are defined in section 4."@en ;
-    sh:class sage:Stance ;
-    sh:node sage:RecordShape ;
-    sh:not [ sh:class rdo:assertion ] ;
-    sh:property [ dcterms:source sage:heldBy,
-                spec:constraints ;
-            skos:changeNote "SAGE profile constraint; cardinality and value requirements are defined in section 4."@en ;
-            sh:class rdo:agent ;
-            sh:maxCount 1 ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:path sage:heldBy ],
-        [ dcterms:source oa:hasTarget,
-                spec:constraints ;
-            skos:changeNote "SAGE profile constraint; cardinality and value requirements are defined in section 4."@en ;
-            sh:class rdo:proposition ;
-            sh:maxCount 1 ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:path oa:hasTarget ],
-        [ dcterms:source oa:hasBody,
-                spec:constraints ;
-            skos:changeNote "SAGE profile constraint; cardinality and value requirements are defined in section 4."@en ;
-            sh:in ( sage:Accepts sage:TentativelyAccepts sage:Rejects sage:WithholdsJudgment ) ;
-            sh:maxCount 1 ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:path oa:hasBody ] ;
-    sh:targetClass sage:Stance ;
-    sh:targetSubjectsOf sage:heldBy .
-
 sage:TextShape a sh:NodeShape ;
     dcterms:source <https://example.org/sage/spec>,
         <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
@@ -572,31 +441,6 @@ sage:TextShape a sh:NodeShape ;
     sh:targetObjectsOf rdo:is_proposition_expressed_in ;
     sh:targetSubjectsOf rdo:has_lexical_structure .
 
-sage:ExplanationShape a sh:NodeShape ;
-    dcterms:source <https://example.org/sage/spec>,
-        <https://github.com/semantic-evidence/semantic-evidence/blob/master/ontology/rdo.owl>,
-        <https://www.w3.org/TR/2014/REC-rdf-schema-20140225/>,
-        <https://www.w3.org/TR/2017/REC-shacl-20170720/> ;
-    rdfs:comment "Explanatory comments and structured rationales on SAGE records."@en ;
-    rdfs:isDefinedBy spec:constraints ;
-    skos:changeNote "SAGE profile requirements and targets are defined in section 4."@en ;
-    sh:property [ dcterms:source sage:hasRationale,
-                spec:constraints ;
-            skos:changeNote "SAGE profile constraint; cardinality and value requirements are defined in section 4."@en ;
-            sh:class rdo:argument ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:path sage:hasRationale ],
-        [ dcterms:source rdfs:comment,
-                spec:constraints ;
-            skos:changeNote "SAGE profile constraint; cardinality and value requirements are defined in section 4."@en ;
-            sh:node sage:ReadableTextShape ;
-            sh:path rdfs:comment ] ;
-    sh:targetClass swande:Question,
-        sage:Decision,
-        sage:DiscourseAssessment,
-        sage:Stance ;
-    sh:targetSubjectsOf sage:hasRationale .
-
 sage:ReadableTextShape a sh:NodeShape ;
     dcterms:source <https://example.org/sage/spec>,
         <https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/>,
@@ -614,11 +458,10 @@ sage:RecordShape a sh:NodeShape ;
         <https://pav-ontology.github.io/pav/>,
         <https://www.w3.org/TR/2013/REC-prov-o-20130430/>,
         <https://www.w3.org/TR/2017/REC-shacl-20170720/> ;
-    rdfs:comment "Shared information-object structure with optional creator, creation time, source, context, and explanatory metadata."@en ;
+    rdfs:comment "Shared information-object structure with optional creator, creation time, source, and explanatory metadata."@en ;
     rdfs:isDefinedBy spec:constraints ;
     skos:changeNote "SAGE structural profile for PROV information entities. Resources use IRIs or blank nodes; the listed metadata fields are optional."@en ;
     sh:class prov:Entity ;
-    sh:node sage:ExplanationShape ;
     sh:nodeKind sh:BlankNodeOrIRI ;
     sh:not [ sh:class prov:Activity ] ;
     sh:property [ dcterms:source pav:createdBy,
@@ -649,10 +492,9 @@ sage:RecordShape a sh:NodeShape ;
             sh:class rdo:agent ;
             sh:nodeKind sh:BlankNodeOrIRI ;
             sh:path pav:curatedBy ],
-        [ dcterms:source sage:inContext,
+        [ dcterms:source rdfs:comment,
                 spec:constraints ;
-            skos:changeNote "Optional context references of any number; omission leaves scope unspecified."@en ;
-            sh:class prov:Entity ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:path sage:inContext ] .
+            skos:changeNote "Optional readable explanatory notes on records."@en ;
+            sh:node sage:ReadableTextShape ;
+            sh:path rdfs:comment ] .
 

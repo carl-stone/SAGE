@@ -44,10 +44,10 @@ public class SemanticChecks {
         OWLReasoner reasoner = new ReasonerFactory().createReasoner(ontology);
         try {
             // Check consistency before querying entailments (inconsistency entails everything).
-            require(reasoner.isConsistent(), "Opposing-stance example is inconsistent");
+            require(reasoner.isConsistent(), "Specification example is inconsistent");
             require(reasoner.getUnsatisfiableClasses().getEntitiesMinusBottom().isEmpty(),
                     "Scenario has an unsatisfiable named class");
-            pass("two researchers can hold opposing stances");
+            pass("the example is consistent and all named classes are satisfiable");
 
             String[][] classes = {
                 {"Proposition", R + "proposition"}, {"Assertion", R + "assertion"},
@@ -68,31 +68,105 @@ public class SemanticChecks {
                     F.getOWLDataProperty(IRI.create(R + "has_lexical_structure"))), true, "text");
             pass("all 14 aliases retain their source meanings");
 
+            for (String kind : new String[]{"Claim", "Hypothesis"}) {
+                entailed(reasoner, F.getOWLSubClassOfAxiom(c(W + kind), c(R + "assertion")), true,
+                        kind + " is an Assertion");
+                entailed(reasoner, F.getOWLSubClassOfAxiom(c(W + kind), c(W + "ResearchStatement")), true,
+                        kind + " remains a ResearchStatement");
+                require(reasoner.isSatisfiable(c(W + kind)), kind + " is unsatisfiable");
+            }
+            for (String node : new String[]{"conclusion", "hypothesis"}) {
+                entailed(reasoner, F.getOWLClassAssertionAxiom(c(R + "assertion"), i(E + node)), true,
+                        node + " is the same Assertion individual");
+                entailed(reasoner, F.getOWLClassAssertionAxiom(c(S + "Assertion"), i(E + node)), true,
+                        node + " also has alias typing");
+                entailed(reasoner, F.getOWLClassAssertionAxiom(c(W + "ResearchStatement"), i(E + node)), true,
+                        node + " retains SWAN typing");
+            }
+            pass("Claims and Hypotheses are Assertions and ResearchStatements on the same individuals");
+
+            entailed(reasoner, F.getOWLSubClassOfAxiom(c(W + "ResearchStatement"), c(R + "assertion")), false,
+                    "all ResearchStatements become Assertions");
+            entailed(reasoner, F.getOWLClassAssertionAxiom(c(R + "assertion"), i(E + "neutralResponse")), false,
+                    "neutral response becomes an Assertion");
+            entailed(reasoner, F.getOWLSubClassOfAxiom(c(W + "Question"), c(W + "DiscourseElement")), true,
+                    "Question is a DiscourseElement");
+            for (String target : new String[]{W + "ResearchStatement", R + "assertion"}) {
+                entailed(reasoner, F.getOWLSubClassOfAxiom(c(W + "Question"), c(target)), false,
+                        "Question becomes " + target);
+                entailed(reasoner, F.getOWLClassAssertionAxiom(c(target), i(E + "question")), false,
+                        "example Question becomes " + target);
+            }
+            entailed(reasoner, F.getOWLEquivalentClassesAxiom(c(R + "assertion"), c(R + "act_of_assertion")), false,
+                    "assertion is equated with its activity");
+            pass("generic ResearchStatements and Questions keep their distinct classifications");
+
+            for (String premise : new String[]{"observation", "hypothesis"}) {
+                entailed(reasoner, F.getOWLObjectPropertyAssertionAxiom(
+                        p(R + "has_premise"), i(E + "argument"), i(E + premise)), true, "premise alias");
+                entailed(reasoner, F.getOWLClassAssertionAxiom(c(W + "Claim"), i(E + premise)), false,
+                        "premise must be an established Claim");
+            }
             entailed(reasoner, F.getOWLObjectPropertyAssertionAxiom(
-                    p(R + "has_premise"), i(E + "argument"), i(E + "assumption")), true, "assumption is a premise");
-            pass("an assumption is a premise of its argument");
+                    p(R + "has_conclusion"), i(E + "argument"), i(E + "conclusion")), true, "conclusion alias");
+            pass("ordinary Assertions and Hypotheses serve as premises without becoming Claims");
 
             entailed(reasoner, F.getOWLObjectPropertyAssertionAxiom(
-                    p(S + "assertedBy"), i(E + "conclusion"), i(E + "researcher")), true, "original asserting agent");
-            entailed(reasoner, F.getOWLObjectPropertyAssertionAxiom(
-                    p(S + "assertedBy"), i(E + "conclusion"), i(E + "assistant")), false, "recorder becomes asserting agent");
-            // Ask about ANY stance held by the recorder, including unnamed individuals.
-            OWLClassExpression holdsStance = F.getOWLObjectSomeValuesFrom(
-                    F.getOWLObjectInverseOf(p(S + "heldBy")), c(S + "Stance"));
-            entailed(reasoner, F.getOWLClassAssertionAxiom(holdsStance, i(E + "assistant")), false,
-                    "recording implies a held stance");
-            pass("recording preserves the author's role without implying a recorder stance");
+                    p(R + "is_assertion_made_by"), i(E + "conclusion"), i(E + "researcher")), true,
+                    "original asserting agent");
+            for (String other : new String[]{"assistant", "curator"})
+                entailed(reasoner, F.getOWLObjectPropertyAssertionAxiom(
+                        p(R + "is_assertion_made_by"), i(E + "conclusion"), i(E + other)), false,
+                        "recording or curation implies assertion");
+            pass("asserting, curating, and recording retain separate attribution");
 
-            require(reasoner.isSatisfiable(c(S + "Assertion")), "Assertion is unsatisfiable");
-            require(reasoner.isSatisfiable(c(S + "Stance")), "Stance is unsatisfiable");
-            require(!reasoner.isSatisfiable(F.getOWLObjectIntersectionOf(c(S + "Assertion"), c(S + "Stance"))),
-                    "Assertion and Stance overlap despite the declared disjointness");
-            pass("Assertion and Stance are individually possible and mutually disjoint");
-
+            String D = "http://purl.org/swan/2.0/discourse-relationships/";
+            String[][] responses = {{"agreement", "respondsPositivelyTo"},
+                                    {"disagreement", "respondsNegativelyTo"},
+                                    {"neutralResponse", "respondsNeutrallyTo"}};
+            for (String[] response : responses)
+                entailed(reasoner, F.getOWLObjectPropertyAssertionAxiom(
+                        p(D + response[1]), i(E + response[0]), i(E + "hypothesis")), true,
+                        "direct " + response[1]);
             entailed(reasoner, F.getOWLObjectPropertyAssertionAxiom(
-                    p("http://purl.org/swan/2.0/discourse-relationships/respondsTo"),
-                    i(E + "argument"), i(E + "question")), false, "assessment entails the direct relationship");
-            pass("the reification encoding keeps the assessed relationship separate");
+                    p(D + "respondsTo"), i(E + "conclusion"), i(E + "question")), true,
+                    "Claim directly responds to Question");
+            for (String name : new String[]{"respondsTo", "respondsPositivelyTo", "respondsNegativelyTo", "respondsNeutrallyTo"}) {
+                entailed(reasoner, F.getOWLObjectPropertyDomainAxiom(p(D + name), c(W + "DiscourseElement")), false,
+                        "SAGE restricts discourse subjects");
+                entailed(reasoner, F.getOWLObjectPropertyRangeAxiom(p(D + name), c(W + "DiscourseElement")), false,
+                        "SAGE restricts discourse objects");
+            }
+            pass("direct discourse relations coexist without added endpoint class restrictions");
+            for (String[] response : responses) {
+                for (String broader : new String[]{"respondsTo", "refersTo", "relatesTo"})
+                    entailed(reasoner, F.getOWLObjectPropertyAssertionAxiom(
+                            p(D + broader), i(E + response[0]), i(E + "hypothesis")), true,
+                            "response inherited as " + broader);
+                entailed(reasoner, F.getOWLObjectPropertyAssertionAxiom(
+                        p(D + "respondsTo"), i(E + "hypothesis"), i(E + response[0])), false,
+                        "response must remain directed");
+            }
+            for (String symmetric : new String[]{"consistentWith", "inconsistentWith", "relevantTo", "alternativeTo"})
+                entailed(reasoner, F.getOWLSymmetricObjectPropertyAxiom(p(D + symmetric)), true,
+                        "source symmetry for " + symmetric);
+            entailed(reasoner, F.getOWLObjectPropertyAssertionAxiom(
+                    p(D + "inconsistentWith"), i(E + "agreement"), i(E + "disagreement")), true,
+                    "symmetric reverse relationship");
+            entailed(reasoner, F.getOWLObjectPropertyAssertionAxiom(
+                    p(D + "relatesTo"), i(E + "agreement"), i(E + "disagreement")), true,
+                    "symmetry followed by superproperty expansion");
+            pass("SWAN hierarchy and symmetry work while responses remain directed");
+
+            for (String node : new String[]{"hypothesis", "laterClaim"})
+                entailed(reasoner, F.getOWLObjectPropertyAssertionAxiom(
+                        p(R + "is_assertion_asserting"), i(E + node), i(E + "p2")), true,
+                        "separate contributions share propositional content");
+            entailed(reasoner, F.getOWLSameIndividualAxiom(i(E + "hypothesis"), i(E + "laterClaim")), false,
+                    "shared content must not merge assertions");
+            entailed(reasoner, F.getOWLClassAssertionAxiom(c(W + "Claim"), i(E + "hypothesis")), false,
+                    "later Claim must not reclassify the earlier Hypothesis");
+            pass("later assertions share content without merging or reclassifying earlier contributions");
         } finally {
             reasoner.dispose();
         }

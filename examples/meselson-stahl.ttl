@@ -1,0 +1,56 @@
+# A compact reconstruction of Meselson and Stahl (1958), pp. 676–678.
+# Reported observations and conclusion are attributed to the paper's authors.
+# Model descriptions and discourse links are the example curator's reconstruction.
+@prefix ms: <https://example.org/sage/examples/meselson-stahl#> .
+@prefix sage: <https://example.org/sage/ontology#> .
+@prefix swande: <http://purl.org/swan/2.0/discourse-elements/> .
+@prefix swandr: <http://purl.org/swan/2.0/discourse-relationships/> .
+@prefix pav: <http://purl.org/pav/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ms:meselson a sage:Agent ; rdfs:label "Matthew Meselson" .
+ms:stahl a sage:Agent ; rdfs:label "Franklin W. Stahl" .
+ms:exampleCurator a sage:Agent ; rdfs:label "SAGE example curator (reconstruction role)" .
+ms:paper a sage:Report ;
+    dcterms:title "The replication of DNA in Escherichia coli" ;
+    dcterms:source <https://doi.org/10.1073/pnas.44.7.671> .
+
+ms:firstGenerationContent a sage:Proposition ;
+    sage:expressedAs [ a sage:Text ; sage:text
+        "In the E. coli nitrogen-shift experiment, only half-labeled DNA was observed after one generation." ] .
+ms:secondGenerationContent a sage:Proposition ;
+    sage:expressedAs [ a sage:Text ; sage:text
+        "After two generations in that experiment, half-labeled and unlabeled DNA occurred in equal amounts." ] .
+ms:subunitContent a sage:Proposition ;
+    sage:expressedAs [ a sage:Text ; sage:text
+        "Under the experiment's conditions, DNA replicates with two conserved nitrogen-containing subunits, each daughter receiving one parental subunit." ] .
+
+ms:firstGeneration a swande:Claim ;
+    sage:asserts ms:firstGenerationContent ; sage:assertedBy ms:meselson, ms:stahl ;
+    pav:authoredBy ms:meselson, ms:stahl ; pav:createdBy ms:exampleCurator ;
+    sage:reportedIn ms:paper .
+ms:secondGeneration a swande:Claim ;
+    sage:asserts ms:secondGenerationContent ; sage:assertedBy ms:meselson, ms:stahl ;
+    pav:authoredBy ms:meselson, ms:stahl ; pav:createdBy ms:exampleCurator ;
+    sage:reportedIn ms:paper .
+ms:subunitConclusion a swande:Claim ;
+    sage:asserts ms:subunitContent ; sage:assertedBy ms:meselson, ms:stahl ;
+    pav:authoredBy ms:meselson, ms:stahl ; pav:createdBy ms:exampleCurator ;
+    sage:reportedIn ms:paper ;
+    swandr:respondsPositivelyTo ms:semiconservativeInterpretation ;
+    swandr:respondsNegativelyTo ms:conservativeInterpretation .
+ms:argument a sage:Argument ;
+    sage:hasPremise ms:firstGeneration, ms:secondGeneration ;
+    sage:hasConclusion ms:subunitConclusion ;
+    pav:authoredBy ms:meselson, ms:stahl ; pav:createdBy ms:exampleCurator ;
+    dcterms:source ms:paper .
+
+# Alternatives are descriptions of models, not assertions that both models hold.
+ms:semiconservativeInterpretation a swande:ResearchStatement ;
+    pav:authoredBy ms:exampleCurator ; dcterms:source ms:paper ;
+    dcterms:description "Semiconservative interpretation: each daughter receives one conserved parental subunit." ;
+    swandr:alternativeTo ms:conservativeInterpretation .
+ms:conservativeInterpretation a swande:ResearchStatement ;
+    pav:authoredBy ms:exampleCurator ; dcterms:source ms:paper ;
+    dcterms:description "Conservative interpretation: one daughter retains both parental subunits and the other receives neither." .

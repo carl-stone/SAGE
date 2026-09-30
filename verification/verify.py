@@ -17,17 +17,12 @@ from rdflib import Graph, Literal, Namespace, RDF, RDFS, OWL, URIRef
 ROOT = Path(__file__).resolve().parents[1]
 SAGE = Namespace('https://example.org/sage/ontology#')
 RDO = Namespace('http://purl.org/see/rdo#')
-PROV = Namespace('http://www.w3.org/ns/prov#')
-OA = Namespace('http://www.w3.org/ns/oa#')
+SWAN = Namespace('http://purl.org/swan/2.0/discourse-elements/')
+SWANDR = Namespace('http://purl.org/swan/2.0/discourse-relationships/')
+PAV = Namespace('http://purl.org/pav/')
 DC = Namespace('http://purl.org/dc/terms/')
 SH = Namespace('http://www.w3.org/ns/shacl#')
 EX = Namespace('https://example.org/project/')
-# OWL 2 DL reserves RDF IRIs. These local names exist ONLY in the reasoner input.
-RDF_NAMES = {RDF.Statement: URIRef('urn:sage:verification:rdf-Statement'),
-             RDF.subject: URIRef('urn:sage:verification:rdf-subject'),
-             RDF.predicate: URIRef('urn:sage:verification:rdf-predicate'),
-             RDF.object: URIRef('urn:sage:verification:rdf-object')}
-
 
 def copy_graph(*graphs: Graph) -> Graph:
     result = Graph()
@@ -40,7 +35,7 @@ def copy_graph(*graphs: Graph) -> Graph:
 
 
 def prepare(data: Graph, schema: Graph) -> Graph:
-    """Exactly spec §5: alias replacement, then subclass/subproperty closure."""
+    """Exactly spec §5: alias replacement, then subclass/subproperty/symmetry closure."""
     classes = dict(schema.subject_objects(OWL.equivalentClass))
     properties = dict(schema.subject_objects(OWL.equivalentProperty))
     result = Graph()
@@ -50,12 +45,15 @@ def prepare(data: Graph, schema: Graph) -> Graph:
         result.add((s, properties.get(p, p), classes.get(o, o) if p == RDF.type else o))
     subclasses = list(schema.subject_objects(RDFS.subClassOf))
     subproperties = list(schema.subject_objects(RDFS.subPropertyOf))
+    symmetric = list(schema.subjects(RDF.type, OWL.SymmetricProperty))
     while True:
         additions = set()
         for child, parent in subclasses:
             additions.update((s, RDF.type, parent) for s in result.subjects(RDF.type, child))
         for child, parent in subproperties:
             additions.update((s, parent, o) for s, o in result.subject_objects(child))
+        for prop in symmetric:
+            additions.update((o, prop, s) for s, o in result.subject_objects(prop))
         additions.difference_update(result)
         if not additions:
             return result
@@ -64,16 +62,8 @@ def prepare(data: Graph, schema: Graph) -> Graph:
 
 
 def owl_view(schema: Graph, declarations: Graph, data: Graph | None = None) -> Graph:
-    """Declaration-complete, reification-renamed OWL view; retains all input triples."""
-    merged = copy_graph(schema, declarations, *([data] if data is not None else []))
-    result = Graph()
-    for prefix, ns in merged.namespaces():
-        result.bind(prefix, ns)
-    for triple in merged:
-        result.add(tuple(RDF_NAMES.get(term, term) for term in triple))
-    result.add((RDF_NAMES[RDF.Statement], RDF.type, OWL.Class))
-    for term in (RDF.subject, RDF.predicate, RDF.object):
-        result.add((RDF_NAMES[term], RDF.type, OWL.ObjectProperty))
+    """Add OWL declarations without renaming or changing the scientific triples."""
+    result = copy_graph(schema, declarations, *([data] if data is not None else []))
     # Explicit individual declarations make the OWL parser's signature unambiguous.
     classes = set(result.subjects(RDF.type, OWL.Class))
     individuals = {s for s, c in result.subject_objects(RDF.type)
@@ -86,12 +76,12 @@ def owl_view(schema: Graph, declarations: Graph, data: Graph | None = None) -> G
     return result
 
 
-def shacl_checks(example: Graph, opposing: Graph, schema: Graph, shapes: Graph, out: Path) -> None:
+def shacl_checks(example: Graph, schema: Graph, shapes: Graph, out: Path, published: dict[str, Graph]) -> None:
     # This is orchestration of pySHACL, not a second SHACL implementation.
     from pyshacl import validate
     from pyshacl.errors import ValidationFailure
 
-    def check(label: str, data: Graph, expected: bool, *, meta=False, failure=None):
+    def check(label: str, data: Graph, expected: bool, *, meta=False, failures=()):
         conforms, report, text = validate(
             data, shacl_graph=shapes, inference='none', meta_shacl=meta,
             do_owl_imports=False, advanced=False, js=False, inplace=False,
@@ -102,27 +92,60 @@ def shacl_checks(example: Graph, opposing: Graph, schema: Graph, shapes: Graph, 
         report.serialize(out / f'{label}.ttl', format='turtle')
         if bool(conforms) != expected:
             raise RuntimeError(f'{label}: unexpected conformance; see {label}.txt')
-        if failure:
-            path, component = failure
+        for focus, path, component in failures:
             matched = any(
-                (r, SH.resultPath, path) in report and
+                (r, SH.focusNode, focus) in report and
+                (path is None or (r, SH.resultPath, path) in report) and
                 (r, SH.sourceConstraintComponent, component) in report
                 for r in report.subjects(RDF.type, SH.ValidationResult))
             if not matched:
-                raise RuntimeError(f'{label}: expected specific violation was not reported')
+                raise RuntimeError(f'{label}: expected violation for {focus} / {path} was not reported')
         print(f'PASS {label}', flush=True)
 
     good = prepare(example, schema)
     check('shacl-example-and-meta', good, True, meta=True)
-    check('shacl-opposing-stances', prepare(opposing, schema), True)
-    missing = copy_graph(good)
-    missing.remove((EX.position, SAGE.heldBy, None))
-    check('shacl-missing-holder-control', missing, False,
-          failure=(SAGE.heldBy, SH.MinCountConstraintComponent))
+    for name, data in published.items():
+        check(f'shacl-{name}', prepare(data, schema), True)
+    # Isolated SWAN-only records exercise inherited targets without property-use
+    # targets or argument links accidentally supplying Assertion validation.
+    for kind in ('Claim', 'Hypothesis'):
+        node = EX['standalone' + kind]
+        complete = copy_graph(example)
+        for triple in [(node, RDF.type, SWAN[kind]),
+                       (node, PAV.authoredBy, EX.researcher),
+                       (node, SAGE.asserts, EX.p2),
+                       (node, SAGE.assertedBy, EX.researcher)]:
+            complete.add(triple)
+        check(f'shacl-{kind.lower()}-inherited', prepare(complete, schema), True)
+        for alias, canonical in ((SAGE.asserts, RDO.is_assertion_asserting),
+                                 (SAGE.assertedBy, RDO.is_assertion_made_by)):
+            missing = copy_graph(complete)
+            missing.remove((node, alias, None))
+            check(f'shacl-{kind.lower()}-missing-{str(alias).split("#")[-1]}',
+                  prepare(missing, schema), False,
+                  failures=[(node, canonical, SH.MinCountConstraintComponent)])
+        bare = copy_graph(complete)
+        bare.remove((node, SAGE.asserts, None))
+        bare.remove((node, SAGE.assertedBy, None))
+        check(f'shacl-{kind.lower()}-type-only-control', prepare(bare, schema), False,
+              failures=[(node, RDO.is_assertion_asserting, SH.MinCountConstraintComponent),
+                        (node, RDO.is_assertion_made_by, SH.MinCountConstraintComponent)])
+    missing_description = copy_graph(example)
+    missing_description.remove((EX.neutralResponse, DC.description, None))
+    check('shacl-generic-statement-needs-formulation', prepare(missing_description, schema), False,
+          failures=[(EX.neutralResponse, None, SH.OrConstraintComponent)])
+    missing_expression = copy_graph(example)
+    missing_expression.remove((EX.p2, SAGE.expressedAs, None))
+    check('shacl-proposition-needs-expression', prepare(missing_expression, schema), False,
+          failures=[(EX.p2, RDO.is_proposition_expressed_in, SH.MinCountConstraintComponent)])
+    bad_description = copy_graph(example)
+    bad_description.add((EX.hypothesis, DC.description, Literal('   ')))
+    check('shacl-optional-description-must-be-readable', prepare(bad_description, schema), False,
+          failures=[(EX.hypothesis, DC.description, SH.NodeConstraintComponent)])
     bad = copy_graph(good)
     bad.set((EX.argument, RDO.has_premise, Literal('raw data instead of an assertion')))
     check('shacl-premise-type-control', bad, False,
-          failure=(RDO.has_premise, SH.ClassConstraintComponent))
+          failures=[(EX.argument, RDO.has_premise, SH.ClassConstraintComponent)])
 
 
 def run(command: list[str], label: str, out: Path) -> None:
@@ -146,10 +169,12 @@ def main() -> int:
     args = parser.parse_args()
     out = args.out.resolve()
     out.mkdir(parents=True, exist_ok=True)
+    example_paths = sorted((ROOT / 'examples').glob('*.ttl'))
     status = {'preparation': 'NOT RUN', 'pyshacl': 'NOT RUN', 'robot_hermit': 'NOT RUN'}
-    summary = {'checks': status, 'scope': 'selected SAGE axioms; reification-renamed OWL-DL view',
+    summary = {'checks': status, 'scope': 'selected SAGE axioms with external OWL declarations',
                'source_sha256': {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
-                                 for name in ('SAGE-Ontology-Specification.md', 'sage.ttl', 'sage.shacl.ttl')}}
+                                 for name in ['SAGE-Ontology-Specification.md', 'sage.ttl', 'sage.shacl.ttl']
+                                 + [str(path.relative_to(ROOT)) for path in example_paths]}}
     (out / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
     try:
         schema = Graph().parse(ROOT / 'sage.ttl', format='turtle')
@@ -164,28 +189,39 @@ def main() -> int:
         if len(blocks) != 1:
             raise RuntimeError('Expected one Turtle example in the specification; select the intended example explicitly')
         example = Graph().parse(data=blocks[0], format='turtle')
-        required = [(EX.argument, SAGE.assumes, EX.assumption),
-                    (EX.position, SAGE.heldBy, EX.researcher),
-                    (EX.conclusion, URIRef('http://purl.org/pav/createdBy'), EX.assistant)]
+        required = [(EX.hypothesis, RDF.type, SWAN.Hypothesis),
+                    (EX.conclusion, RDF.type, SWAN.Claim),
+                    (EX.argument, SAGE.hasPremise, EX.hypothesis),
+                    (EX.conclusion, PAV.createdBy, EX.assistant),
+                    (EX.conclusion, PAV.curatedBy, EX.curator),
+                    (EX.agreement, SWANDR.respondsPositivelyTo, EX.hypothesis),
+                    (EX.disagreement, SWANDR.respondsNegativelyTo, EX.hypothesis),
+                    (EX.neutralResponse, SWANDR.respondsNeutrallyTo, EX.hypothesis)]
         if not all(t in example for t in required):
-            raise RuntimeError('Spec example changed; update the small semantic checks to match')
-        # One additional scenario: two distinct researchers take opposing positions.
-        opposing = copy_graph(example)
-        for triple in [(EX.peer, RDF.type, SAGE.Agent), (EX.peer, RDF.type, PROV.Person),
-                       (EX.peer, OWL.differentFrom, EX.researcher),
-                       (EX.peerPosition, RDF.type, SAGE.Stance),
-                       (EX.peerPosition, SAGE.heldBy, EX.peer),
-                       (EX.peerPosition, OA.hasTarget, EX.p3),
-                       (EX.peerPosition, OA.hasBody, SAGE.Rejects),
-                       (EX.peerPosition, OWL.differentFrom, EX.position),
-                       (SAGE.Accepts, OWL.differentFrom, SAGE.Rejects)]:
-            opposing.add(triple)
+            raise RuntimeError('Spec example changed; update the semantic checks to match')
+        published = {path.stem: Graph().parse(path, format='turtle') for path in example_paths}
+        for name, data in published.items():
+            prepare(data, schema).serialize(out / f'{name}-prepared.ttl', format='turtle')
+        prepared = prepare(example, schema)
+        for node in (EX.hypothesis, EX.conclusion):
+            if (node, RDF.type, RDO.assertion) not in prepared or (node, RDF.type, SWAN.ResearchStatement) not in prepared:
+                raise RuntimeError(f'{node} did not inherit Assertion and ResearchStatement')
+        if (EX.neutralResponse, RDF.type, RDO.assertion) in prepared:
+            raise RuntimeError('A generic ResearchStatement must not automatically become an Assertion')
+        for node in (EX.agreement, EX.disagreement, EX.neutralResponse):
+            for relation in (SWANDR.respondsTo, SWANDR.refersTo, SWANDR.relatesTo):
+                if (node, relation, EX.hypothesis) not in prepared:
+                    raise RuntimeError('Discourse hierarchy did not expand')
+            if (EX.hypothesis, SWANDR.respondsTo, node) in prepared:
+                raise RuntimeError('A directed response was incorrectly reversed')
+        if (EX.agreement, SWANDR.inconsistentWith, EX.disagreement) not in prepared:
+            raise RuntimeError('Symmetric discourse relationship did not expand')
+        if set(prepared) != set(prepare(prepared, schema)):
+            raise RuntimeError('Preparation is not idempotent')
         example.serialize(out / 'example.ttl', format='turtle')
-        prepare(example, schema).serialize(out / 'example-prepared.ttl', format='turtle')
-        prepare(opposing, schema).serialize(out / 'opposing-prepared.ttl', format='turtle')
+        prepared.serialize(out / 'example-prepared.ttl', format='turtle')
         owl_view(schema, declarations).serialize(out / 'schema-owl-view.ttl', format='turtle')
-        owl_view(schema, declarations, opposing).serialize(out / 'scenario-owl-view.ttl', format='turtle')
-        (out / 'rdf-name-map.json').write_text(json.dumps({str(k): str(v) for k, v in RDF_NAMES.items()}, indent=2) + '\n')
+        owl_view(schema, declarations, copy_graph(example, *published.values())).serialize(out / 'scenario-owl-view.ttl', format='turtle')
         status['preparation'] = 'PASS'
         print('PASS parse and prepare current specification example', flush=True)
         if args.prepare_only:
@@ -194,7 +230,7 @@ def main() -> int:
         errors = []
         try:
             summary['pyshacl_version'] = importlib.metadata.version('pyshacl')
-            shacl_checks(example, opposing, schema, shapes, out)
+            shacl_checks(example, schema, shapes, out, published)
             status['pyshacl'] = 'PASS'
         except (ImportError, importlib.metadata.PackageNotFoundError) as exc:
             status['pyshacl'] = 'BLOCKED: install requirements-verify.txt'
