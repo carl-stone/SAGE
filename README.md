@@ -1,5 +1,7 @@
 # SAGE
 
+**Version 0.1 — frozen 2026-10-02.** This version preserves the ontology, SHACL profile, and normative specification audited at commit `b4e91c53d033f57c29fa9691c9fa7820c0b7ac0a`, with the selected SWAN and SEE scope defined below.
+
 SAGE unifies SWAN's scientific discourse vocabulary with SEE's Reasoning and Discourse Ontology. A SWAN Claim or Hypothesis is also a SEE Assertion on the same individual, with its content, asserting agent, and argument connections. Direct SWAN relationships connect scientific contributions; their hierarchy and symmetry support queries at broader levels. Claims and Hypotheses use their proposition text without requiring a duplicate description.
 
 Read [SAGE-Ontology-Specification.md](SAGE-Ontology-Specification.md) for the normative definition and worked example.

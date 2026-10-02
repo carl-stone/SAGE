@@ -1,5 +1,7 @@
 # SAGE Ontology Specification
 
+**Version 0.1 — frozen 2026-10-02.**
+
 **Scientific Argument Graph & Epistemology**
 
 SAGE unifies SWAN's scientific discourse vocabulary and SEE's Reasoning and Discourse Ontology (RDO). It describes scientific contributions, their propositional content, the agents asserting them, and the arguments and discourse relationships connecting them. [SWAN] [SEE] [SAGE]
