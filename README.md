@@ -11,7 +11,6 @@ Read [SAGE-Ontology-Specification.md](SAGE-Ontology-Specification.md) for the no
 | `SAGE-Ontology-Specification.md` | Scientific model, vocabulary, alignments, and structural requirements. |
 | `sage.ttl` | Exact aliases and selected OWL/RDFS axioms, including the two SAGE alignments. |
 | `sage.shacl.ttl` | Structural validation, including inherited Assertion requirements for Claims and Hypotheses. |
-| `REWRITE-NOTES.md` | Applied design decisions for this rewrite. |
 
 The specification and Turtle files can be used without the verification tools. Before applying SHACL, normalize aliases and expand the selected subclass/subproperty and symmetry axioms as described in specification §5.
 
